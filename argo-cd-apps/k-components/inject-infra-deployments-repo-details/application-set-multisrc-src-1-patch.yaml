@@ -4,4 +4,4 @@
   value: https://github.com/maruiz93/infra-deployments.git
 - op: replace
   path: /spec/template/spec/sources/1/targetRevision
-  value: preview-switch_to_distributed_loki_deployment
+  value: preview-preview-switch_to_distributed_loki_deployment
