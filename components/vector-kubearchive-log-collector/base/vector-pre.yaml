@@ -40,16 +40,16 @@ seccompProfiles:
 supplementalGroups:
   type: RunAsAny
 users:
-- system:serviceaccount:product-kubearchive-logging:vector-kubearchive-log-collector
+- system:serviceaccount:product-kubearchive-logging:vector
 - system:serviceaccount:product-kubearchive-logging:loki
 - system:serviceaccount:product-kubearchive-logging:loki-sa
-- system:serviceaccount:product-kubearchive-logging:vector-kubearchive-log-collector-grafana
-- system:serviceaccount:product-kubearchive-logging:vector-kubearchive-log-collector-loki
-- system:serviceaccount:product-kubearchive-logging:vector-kubearchive-log-collector-loki-canary
+- system:serviceaccount:product-kubearchive-logging:grafana
+- system:serviceaccount:product-kubearchive-logging:minio-sa
 volumes:
 - configMap
 - emptyDir
 - hostPath
+- persistentVolumeClaim
 - projected
 - secret
 ---
@@ -81,7 +81,7 @@ roleRef:
   name: kubearchive-vector-scc-user
 subjects:
 - kind: ServiceAccount
-  name: vector-kubearchive-log-collector
+  name: vector
   namespace: product-kubearchive-logging
 - kind: ServiceAccount
   name: loki
@@ -90,13 +90,10 @@ subjects:
   name: loki-sa
   namespace: product-kubearchive-logging
 - kind: ServiceAccount
-  name: vector-kubearchive-log-collector-grafana
+  name: grafana
   namespace: product-kubearchive-logging
 - kind: ServiceAccount
-  name: vector-kubearchive-log-collector-loki
-  namespace: product-kubearchive-logging
-- kind: ServiceAccount
-  name: vector-kubearchive-log-collector-loki-canary
+  name: minio-sa
   namespace: product-kubearchive-logging
 ---
 apiVersion: v1
@@ -112,23 +109,40 @@ metadata:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: vector-kubearchive-log-collector-loki
+  name: loki
   namespace: product-kubearchive-logging
   annotations:
     argocd.argoproj.io/sync-wave: "-1"  # Before workloads
+  labels:
+    app.kubernetes.io/part-of: loki
+    app.kubernetes.io/name: loki
+    app.kubernetes.io/instance: loki
+    app.kubernetes.io/component: logging
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: vector-kubearchive-log-collector-grafana
+  name: grafana
   namespace: product-kubearchive-logging
   annotations:
     argocd.argoproj.io/sync-wave: "-1"  # Before workloads
+  labels:
+    app.kubernetes.io/part-of: grafana
+    app.kubernetes.io/name: grafana
+    app.kubernetes.io/instance: grafana
+    app.kubernetes.io/component: visualization
+
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: vector-kubearchive-log-collector-loki-canary
+  name: minio-sa
   namespace: product-kubearchive-logging
   annotations:
     argocd.argoproj.io/sync-wave: "-1"  # Before workloads
+  labels:
+    app.kubernetes.io/part-of: loki
+    app.kubernetes.io/name: minio
+    app.kubernetes.io/instance: minio
+    app.kubernetes.io/component: storage
+
